@@ -1,0 +1,61 @@
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+local function getGuiParent()
+    if gethui then return gethui()
+    elseif CoreGui then return CoreGui
+    else return Players.LocalPlayer:WaitForChild("PlayerGui") end
+end
+
+local parent = getGuiParent()
+
+for _, child in pairs(parent:GetChildren()) do
+    if child.Name == "ArceusPinkStats" then child:Destroy() end
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ArceusPinkStats"
+ScreenGui.Parent = parent
+ScreenGui.IgnoreGuiInset = true 
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Name = "StatsText"
+InfoLabel.Parent = ScreenGui
+
+InfoLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+InfoLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+InfoLabel.Size = UDim2.new(0, 350, 0, 80)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.TextSize = 40
+InfoLabel.TextColor3 = Color3.fromRGB(255, 105, 180)
+InfoLabel.Font = Enum.Font.FredokaOne
+InfoLabel.TextStrokeTransparency = 0
+InfoLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+InfoLabel.Text = "..."
+
+local lastUpdate = 0
+local updateInterval = 0.5
+
+RunService.RenderStepped:Connect(function(deltaTime)
+    local now = tick()
+    if now - lastUpdate >= updateInterval then
+        local fps = math.floor(1 / deltaTime)
+        local ping = 0
+        pcall(function()
+            ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+        end)
+
+        InfoLabel.Text = string.format("FPS: %d   |   Ping: %d ms", fps, ping)
+        
+        if ping > 250 then
+            InfoLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        else
+            InfoLabel.TextColor3 = Color3.fromRGB(255, 105, 180)
+        end
+        
+        lastUpdate = now
+    end
+end)
