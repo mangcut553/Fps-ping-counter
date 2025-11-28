@@ -55,7 +55,9 @@ RunService.RenderStepped:Connect(function(deltaTime)
         else
             InfoLabel.TextColor3 = Color3.fromRGB(255, 105, 180)
         end
-        
+
+setfpscap(20)
+
         lastUpdate = now
     end
 end)
